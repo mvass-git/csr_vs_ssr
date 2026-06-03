@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>SSR vs CSR</h1>
+    <h2>SSR comment post</h2>
+    <form method="post" action="/comment/ssr">
+        <input name="com" type="text" required maxlength="5000">
+        <button type="submit">ПОСТУЄМО</button>
+    </form>
+
+    <h2>CSR comment post</h2>
+    <form id = "form_csr">
+        <input id="csr_input" name="com" type="text" required maxlength="5000">
+        <button id="csr_submit"  type="submit">ПОСТУЄМО</button>
+    </form>
+
+    <div id="comments_block">
+        <ul id="com_list">
+            {% for com in comments%}
+            <li>{{com}}</li>
+            {% endfor%}
+        </ul>
+    </div>
+    <script>
+        const inp = document.getElementById("csr_input");
+        const btn = document.getElementById("csr_submit");
+        const l = document.getElementById("com_list")
+
+        const form = document.getElementById("form_csr")
+
+
+
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const text = inp.value;
+
+            if(!text){
+                return;
+            }
+            console.log("before fetch")
+            let respond = await fetch("/comment/csr",
+            {
+                method: "POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({"com":text})
+            }); 
+            console.log("before fetch")
+
+            let new_com = document.createElement("li")
+            console.log(respond)
+            console.log(respond.new_com)
+
+            let data =await respond.json()
+            new_com.textContent = data.new_com
+            l.appendChild(new_com)
+        });
+    </script>
+</body>
+</html>
